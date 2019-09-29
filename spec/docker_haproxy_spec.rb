@@ -3,7 +3,7 @@ $stdout.sync = true
 
 image = 'haproxy'
 tag = 'latest'
-haproxyconf = "haproxy.conf"
+haproxyconf = 'haproxy.conf'
 
 describe "image #{image}:#{tag}"  do
 
@@ -15,15 +15,18 @@ describe "image #{image}:#{tag}"  do
     else
       testimage = "#{image}"
     end
-    haproxyconf = ""
-    currentdir = Dir.pwd
+    testhaproxyconf = ""
     if (haproxyconf)
-      testhaproxyconf = "-v #{currentdir}/#{haproxyconf}:/usr/local/etc/haproxy/haproxy.cfg"
+      # do not map file if file does not exist or is a directory
+      absPath = "#{Dir.pwd}/#{haproxyconf}"
+      if (File.file?(absPath))
+        testhaproxyconf = "-v #{absPath}:/usr/local/etc/haproxy/haproxy.cfg"
+      end
     end
     # not supressing printing the container id for later reference (e.g. cleanup)
     print "container_id spawned: "
-    system("docker run --rm -d --name test#{image} #{testhaproxyconf} #{image}:#{tag} sleep 600" )
-    @container = Docker::Container.get("test#{image}")
+    system("docker run --rm -d --name #{image} #{testhaproxyconf} #{image}:#{tag} sleep 600" )
+    @container = Docker::Container.get("#{image}")
       set :backend, :docker
       set :docker_container, @container.id
   end
@@ -48,7 +51,7 @@ describe "image #{image}:#{tag}"  do
 
   ## Cleaning up the mass
   after(:all) do
-    system ("docker rm -f test#{image} > /dev/null")
+    system ("docker rm -f #{image} > /dev/null")
   end
 end
 
