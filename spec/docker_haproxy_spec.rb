@@ -1,4 +1,5 @@
 require 'dockerspec/serverspec'
+$stdout.sync = true
 
 image = 'haproxy'
 tag = 'latest'
@@ -19,7 +20,9 @@ describe "image #{image}:#{tag}"  do
     if (haproxyconf)
       testhaproxyconf = "-v #{currentdir}/#{haproxyconf}:/usr/local/etc/haproxy/haproxy.cfg"
     end
-    output = system("docker run --rm -d --name test#{image} #{testhaproxyconf} #{image}:#{tag} sleep 600" )
+    # not supressing printing the container id for later reference (e.g. cleanup)
+    print "container_id spawned: "
+    system("docker run --rm -d --name test#{image} #{testhaproxyconf} #{image}:#{tag} sleep 600" )
     @container = Docker::Container.get("test#{image}")
       set :backend, :docker
       set :docker_container, @container.id
@@ -45,7 +48,7 @@ describe "image #{image}:#{tag}"  do
 
   ## Cleaning up the mass
   after(:all) do
-    system ("docker rm -f test#{image}")
+    system ("docker rm -f test#{image} > /dev/null")
   end
 end
 
