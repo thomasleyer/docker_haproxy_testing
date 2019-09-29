@@ -23,9 +23,11 @@ describe "image #{image}:#{tag}"  do
         testhaproxyconf = "-v #{absPath}:/usr/local/etc/haproxy/haproxy.cfg"
       end
     end
+    command = "docker run --rm -d --name #{image} #{testhaproxyconf} #{image}:#{tag} sleep 600"
     # not supressing printing the container id for later reference (e.g. cleanup)
+    puts "docker command: #{command}"
     print "container_id spawned: "
-    system("docker run --rm -d --name #{image} #{testhaproxyconf} #{image}:#{tag} sleep 600" )
+    system(command)
     @container = Docker::Container.get("#{image}")
       set :backend, :docker
       set :docker_container, @container.id

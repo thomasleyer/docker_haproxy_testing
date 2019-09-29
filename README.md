@@ -21,10 +21,11 @@ Using ruby system()-calls in rspec's before and after steps.
 ## What it looks like
 
 ```
-#rspec spec/
+rspec spec/
 
 image haproxy:latest
-27e173e4183c3f25e38be88053aaa3c995e498cc67305efba31152fd555ac102
+docker command: docker run --rm -d --name haproxy -v /tmp/docker_haproxy_testing/haproxy.conf:/usr/local/etc/haproxy/haproxy.cfg haproxy:latest sleep 600
+container_id spawned: 320869b06f0c015bfdc7b2e82e4285229f2b3343f7a9712c8b1f8fc01c487c49
   Docker Build from id: "haproxy:latest"
     cmd
       should eq ["haproxy", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
@@ -36,10 +37,8 @@ image haproxy:latest
       should be file
       should be executable
       should be owned by "root"
-testhaproxy
 
-Finished in 8.29 seconds (files took 0.43959 seconds to load)
+Finished in 7.37 seconds (files took 0.43488 seconds to load)
 6 examples, 0 failures
-
 #
 ```
